@@ -1,0 +1,825 @@
+<script type="text/javascript">
+
+    function submit_modify_grade()
+    {
+        var flag = true;
+        var score = [];
+        var courseid = [];
+        var stuid = [];
+        var select = [];
+
+        var class_stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+
+        for(var i = 1; i < class_stu.length; i++)
+        {
+            courseid[i] = class_stu[i].getElementsByTagName('td')[0].innerHTML;
+            stuid[i] = class_stu[i].getElementsByTagName('td')[2].innerHTML;
+            score[i] = class_stu[i].getElementsByTagName('td')[4].getElementsByTagName("input")[0].valueAsNumber;
+            select[i] = class_stu[i].getElementsByTagName('td')[5].getElementsByTagName("input")[0].checked;
+        }
+
+        var results = [];
+        var tmp = {};
+        for(var i = 1; i < class_stu.length; i++)
+        {
+            if(flag === false) break;
+            if(select[i])
+            {
+                if(!isNaN(score[i]))
+                {
+                    tmp["courseID"] = courseid[i];
+                    tmp["stuID"] = stuid[i];
+                    tmp["newgrade"] = score[i];
+                    results.push( JSON.parse(JSON.stringify(tmp)) );
+                }
+                else
+                {
+                    flag = false;
+                    alert("还有选中的学生的修改后成绩没有输入！");
+                    //return false;
+                }
+            }
+            else
+            {
+                if(score[i])
+                {
+                    flag = false;
+                    alert("请勾选后再进行修改！");
+                    //return false;
+                }
+            }
+        }
+        if(flag === true )
+        {
+            console.info("submit");
+            var json_str = JSON.stringify(results);    //将JSON对象转变成JSON格式的字符串
+            var data_input = document.getElementById('grade-data');
+            data_input.value = json_str;
+            //return true;
+            document.getElementById("modify_grade_form").submit();
+        //alert(json_str);
+        }
+    }
+
+    function modify_select_all()
+    {
+        var stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('th');
+        var tmp = stu[5].getElementsByTagName('input')[0].checked;
+        if(tmp)
+        {
+            var class_stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            for(var i = 1; i < class_stu.length; i++)
+            {
+                class_stu[i].getElementsByTagName('td')[5].getElementsByTagName("input")[0].checked = true;
+            }
+            //alert("全选");
+        }
+        else
+        {
+            var class_stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            for(var i = 1; i < class_stu.length; i++)
+            {
+                class_stu[i].getElementsByTagName('td')[5].getElementsByTagName("input")[0].checked = false;
+            }
+            //alert("取消全选");
+        }
+    }
+
+    function typein_select_all()
+    {
+        var stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('th');
+        var tmp = stu[4].getElementsByTagName('input')[0].checked;
+        if(tmp)
+        {
+            var class_stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            for(var i = 1; i < class_stu.length; i++)
+            {
+                class_stu[i].getElementsByTagName('td')[4].getElementsByTagName("input")[0].checked = true;
+            }
+            //alert("录入成绩全选");
+        }
+        else
+        {
+            var class_stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+            for(var i = 1; i < class_stu.length; i++)
+            {
+                class_stu[i].getElementsByTagName('td')[4].getElementsByTagName("input")[0].checked = false;
+            }
+            //alert("录入成绩取消全选");
+        }
+    }
+
+    function submit_grade()
+    {
+        var score = [];
+        var courseid = [];
+        var stuid = [];
+        var select = [];
+
+        var class_stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        for(var i = 1; i < class_stu.length; i++)
+        {
+            courseid[i] = class_stu[i].getElementsByTagName('td')[0].innerHTML;
+            stuid[i] = class_stu[i].getElementsByTagName('td')[2].innerHTML;
+            score[i] = class_stu[i].getElementsByTagName('td')[3].getElementsByTagName("input")[0].valueAsNumber;
+            select[i] = class_stu[i].getElementsByTagName('td')[4].getElementsByTagName("input")[0].checked;
+        }
+
+        var results = [];
+        var tmp = {};
+        for(var i = 1; i < class_stu.length; i++)
+        {
+            if(select[i])
+            {
+                //alert("选中的的学生的成绩返回后端进行保存");
+                if(score[i])
+                {
+                    tmp["courseID"] = courseid[i];
+                    tmp["stuID"] = stuid[i];
+                    tmp["newgrade"] = score[i];
+                    results.push( JSON.parse(JSON.stringify(tmp)) );
+                }
+                else
+                {
+                    alert("还有选中的学生的成绩没有输入！");
+                    return;
+                }
+            }
+            else
+            {
+                if(score[i])
+                {
+                    alert("请勾选后再进行提交！");
+                    return;
+                }
+            }
+        }
+
+        var json_str = JSON.stringify(results);    //将JSON对象转变成JSON格式的字符串
+        $.post("/typein-grade/", json_str, "json");
+        setTimeout("location.reload()", 666);
+        //alert(json_str);
+    }
+
+    function delete_student_grade_select_all()
+    {
+        var stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('th');
+        var tmp = stu[4].getElementsByTagName('input')[0].checked;
+
+        var class_stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        for(var i = 1; i < class_stu.length; i++)
+        {
+            class_stu[i].getElementsByTagName('td')[4].getElementsByTagName("input")[0].checked = tmp;
+        }
+    }
+
+    function delete_grade_typein_modify_delete_student_get_datas()
+    {
+        var courseid = [];
+        var stuid = [];
+        var select = [];
+
+        var class_stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        for(var i = 1; i < class_stu.length; i++)
+        {
+            courseid[i] = class_stu[i].getElementsByTagName('td')[0].innerHTML;
+            stuid[i] = class_stu[i].getElementsByTagName('td')[2].innerHTML;
+            select[i] = class_stu[i].getElementsByTagName('td')[4].getElementsByTagName("input")[0].checked;
+        }
+
+        var results = [];
+        var tmp = {};
+        for(var i = 1; i < class_stu.length; i++)
+        {
+            if(select[i])
+            {
+                tmp["courseID"] = courseid[i];
+                tmp["stuID"] = stuid[i];
+                results.push( JSON.parse(JSON.stringify(tmp)) );
+            }
+        }
+
+        var json_str = JSON.stringify(results);    //将JSON对象转变成JSON格式的字符串
+        return json_str;
+    }
+
+    function submit_delete_student_grade_grade()
+    {
+        var json_str = delete_grade_typein_modify_delete_student_get_datas();
+        $.post("/delete-student-grade/", json_str, "json");
+        setTimeout("location.reload()", 666);
+        //alert(json_str);
+    }
+
+    function get_submit_typein_info()
+    {
+        var datas = [];
+        var stu_row = document.getElementsByTagName('table')[0].getElementsByTagName('tr');
+        var stu_col;
+
+        for(var i = 1; i < stu_row.length; i++)
+        {
+            stu_col = stu_row[i].getElementsByTagName('td');
+            var tmp = [];
+            for(var j = 0; j < stu_col.length; j++)
+            {
+                tmp[j] = stu_col[j].getElementsByTagName('input')[0].value;
+                if(tmp[j] == "")
+                {
+                    alert("请先完成当前信息的填写再提交！");
+                    return;
+                }
+            }
+            datas.push( JSON.parse(JSON.stringify(tmp)) );
+        }
+        return datas;
+    }
+
+    function submit_typein_student()
+    {
+        var datas = get_submit_typein_info();
+
+        var results = [];
+        var tmp = {};
+        for(var i = 0; i < datas.length; i++)
+        {
+            tmp["stuID"] = datas[i][0];
+            tmp["stuName"] = datas[i][1];
+            tmp["stuSex"] = datas[i][2];
+            tmp["stuMajor"] = datas[i][3];
+            tmp["stuAge"] = datas[i][4];
+            tmp["stuClass"] = datas[i][5];
+            tmp["courseID"] = datas[i][6];
+            results.push( JSON.parse(JSON.stringify(tmp)) );
+        }
+        var json_str = JSON.stringify(results);    //将JSON对象转变成JSON格式的字符串
+        $.post("/typein-student/", json_str, "json");
+        setTimeout("location.reload()", 666);
+        //alert(json_str);
+    }
+
+    function submit_modify_student_info()
+    {
+        var json_str = delete_grade_typein_modify_delete_student_get_datas();
+        $.post("/teacher-modify-student-info/", json_str, "json");
+        setTimeout("location.reload()", 666);
+       // alert(json_str)
+    }
+
+    var typein_student_flag = false;
+
+    function typein_student_select_all()
+    {
+        typein_student_flag = !typein_student_flag;
+        var class_stu = document.getElementsByTagName('tbody')[0].getElementsByTagName('tr');
+        for(var i = 1; i < class_stu.length; i++)
+        {
+            class_stu[i].getElementsByTagName('td')[4].getElementsByTagName("input")[0].checked = typein_student_flag;
+        }
+    }
+
+    function modify_student_select_all()
+    {
+        typein_student_select_all();
+    }
+
+    function delete_student_select_all()
+    {
+        typein_student_select_all();
+    }
+
+    function submit_delete_student()
+    {
+        var json_str = delete_grade_typein_modify_delete_student_get_datas();
+        $.post("/teacher-delete-student-info/", json_str, "json");
+        setTimeout("location.reload()", 666);
+        //alert(json_str)
+    }
+
+    var add_empty_row_num = 0;
+    function add_empty_row(table_id)
+    {
+         var stu_row = document.getElementsByTagName('table')[0].getElementsByTagName('tr');
+         var stu_col;
+        if(add_empty_row_num != 0)
+        {
+            for(var i = 1; i < stu_row.length; i++)
+            {
+                stu_col = stu_row[i].getElementsByTagName('td');
+                var tmp;
+                for(var j = 0; j < stu_col.length; j++)
+                {
+                    tmp = stu_col[j].getElementsByTagName('input')[0].value;
+                    if(tmp == "")
+                    {
+                        alert("请先完成当前信息的填写再添加！");
+                        return;
+                    }
+                }
+            }
+        }
+        add_empty_row_num = 1;
+        var insert = "";
+        stu_col = stu_row[0].getElementsByTagName('th');
+        for(var j = 0; j < stu_col.length; j++)
+        {
+            insert += "<td><input type='text' class='form-control'></td>";
+        }
+        var new_elem = document.createElement("tr");
+        new_elem.innerHTML = insert;
+        var append_form = document.getElementById(table_id);
+        append_form.appendChild(new_elem);
+    }
+
+
+</script>
+
+
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+    <meta name="description" content="">
+    <meta name="author" content="">
+    <link rel="icon" href="favicon.ico">
+
+    <title>学生成绩系统</title>
+
+      <link href="/static/css/bootstrap.min.css" rel="stylesheet">
+      <!--<link href="/static/css/dashboard.css" rel="stylesheet">-->
+
+      <link href="/static/css/teacher-sta.css" rel="stylesheet">
+
+      <link href="/static/css/admin-system.css" rel="stylesheet">
+      <script src="/static/js/jquery.min.js"></script>
+      <script src="/static/highchart/js/highcharts.js"></script>
+      <script src="/static/highchart/js/modules/exporting.js"></script>
+
+  </head>
+
+  <body>
+
+    <nav class="navbar navbar-inverse navbar-fixed-top">
+      <div class="container-fluid">
+        <div class="navbar-header">
+          <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar" aria-expanded="false" aria-controls="navbar">
+            <span class="sr-only">Toggle navigation</span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </button>
+          <!--<a class="navbar-brand" href="#">Project name</a>-->
+            {% if user_type == 'teacher' %}
+		    <h4 style="color:#FFFFFF;">教师</h4>
+            {% endif %}
+        </div>
+        <div id="navbar" class="navbar-collapse collapse">
+          <ul class="nav navbar-nav navbar-right">
+            <li><a href="logout/">退出系统</a></li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <div class="container-fluid">
+      <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+          <ul class="nav nav-sidebar">
+            <!--
+			<li class="active"><a href="#">Overview <span class="sr-only">(current)</span></a></li>
+            -->
+			<li><a href="/check-info/">查看个人信息</a></li>
+			<li><a href="/check-course-info/">查看课程信息</a></li>
+			<li><a href="/typein-grade/">录入学生成绩</a></li>
+            <li><a href="/check-grade/">查看学生成绩</a></li>
+			<li><a href="/modify-student-grade/">修改学生成绩</a></li>
+			<li><a href="/delete-student-grade/">删除学生成绩</a></li>
+			<li><a href="/statistics-student-grade/">统计学生成绩</a></li>
+            <li><a href="/typein-student/">录入学生信息</a></li>
+            <li><a href="/teacher-modify-student-info/">修改学生信息</a></li>
+            <li><a href="/teacher-delete-student-info/">删除学生信息</a></li>
+			<li><a href="/modify-password/">修改密码</a></li>
+          </ul>
+        </div>
+
+        <div id = "chart" class="col-sm-9 col-sm-offset-3 col-md-10 col-md-offset-2 main">
+            <!-- <div class="table-responsive">-->
+                    <!-- 用户查看基本信息-->
+                    {% if user_action_type == 'check_info' %}
+                        <table class="table table-striped">
+                            {% if results %}
+                                <h2 class="sub-header">基本信息</h2>
+                                <tbody>
+                                 <tr>
+                                     <th>教师号</th>
+                                     <td>{{ results.teacherID }}</td>
+                                     <th>姓名</th>
+                                     <td>{{ results.teacherName }}</td>
+                                 </tr>
+                                 <tr>
+                                     <th>性别</th>
+                                     <td>{{ results.teacherSex }}</td>
+                                     <th>年龄</th>
+                                     <td>{{ results.teacherAge }}</td>
+                                  </tr>
+                                 </tbody>
+                            {% else %}
+                                 <p>没有该老师的信息</p>
+                            {% endif %}
+                        </table>
+                        <!-- 用户修改密码 -->
+                    {% elif user_action_type == 'modify_password' %}
+
+                    <form method = "post" name = "modify" action = "/modify-password/">
+                        <table class="table table-striped">
+                            <h2 class="sub-header">修改密码</h2>
+                            <p>{{ modify_password_result }}</p>
+                               <tbody>
+                               <tr>
+                                   <th>旧密码：</th>
+                                   <td><input type="password" name="oldpassword" value="" placeholder="OldPassword"></td>
+                               </tr>
+                               <tr>
+                                   <th>新密码：</th>
+                                   <td><input type="password" name="newpassword" value="" placeholder="NewPassword"></td>
+                               </tr>
+                               <tr>
+                                   <th>再次确认：</th>
+                                   <td><input type="password" name="newpassword2" value="" placeholder="Password Again"></td>
+                               </tr>
+                               </tbody>
+                        </table>
+                        <div class="myStyle">
+                            <button class="btn btn-primary btn-block" type="submit" style="width: 176px">确认修改</button>
+                        </div>
+                    </form>
+                        <!-- 老师查看自己所教的课程信息 -->
+                    {% elif user_action_type == 'check_course_info' %}
+                        <table class="table table-striped">
+                            {% if results %}
+                              <h2 class="sub-header">课程信息</h2>
+                              <tbody>
+                                  <tr>
+                                      <th>课程号</th>
+                                      <th>课程名</th>
+                                      {% for result in results %}
+                                          <tr>
+                                              <td>{{ result.courseID }}</td>
+                                               <td>{{ result.courseName }}</td>
+                                          </tr>
+                                      {% endfor %}
+                                  </tr>
+                              </tbody>
+                          {% else %}
+                              <p>暂时没有课程信息</p>
+                          {% endif %}
+                        </table>
+                        <!--教师录入学生信息-->
+                    {% elif user_action_type == 'typein_student' %}
+                        <h2 class="sub-header">录入学生信息</h2>
+                        <div>
+                            <td><input type = "button"  class="btn btn-primary btn-sm" value = "增加" style="width: 176px" onclick="add_empty_row('typein-student-table')"/></td>
+                            <td><input type = "button"  class="btn btn-primary btn-sm" value = "提交"  style="width: 176px" onclick="submit_typein_student()"/></td>
+                        </div>
+                        <div>
+                        <table class="table table-striped" id = "typein-student-table">
+                        <tbody>
+                        <tr>
+                            <th>学号</th>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>专业</th>
+                            <th>年龄</th>
+                            <th>班级</th>
+                            <th>课程号</th>
+                        </tr>
+                        </tbody>
+                        </table>
+                        </div>
+                       <!--教师修改学生信息-->
+                    {% elif user_action_type == 'teacher_modify_student_info' %}
+                         <!--<form method = "post" name = "modify_grade_form">-->
+                             <table class="table table-striped" id = "modify-student-info-table"">
+                                 {% if results %}
+                                      <h2 class="sub-header">修改学生信息</h2>
+                                      <tbody>
+                                      <tr>
+                                           <th>课程号</th>
+                                           <th>课程名</th>
+                                           <th>学生学号</th>
+                                           <th>姓名</th>
+                                           <th>取消选中</th>
+                                          {% for result in results %}
+                                             <tr>
+                                               <td>{{ result.courses.courseID }}</td>
+                                               <td>{{ result.courses.courseName }}</td>
+                                               <td>{{ result.students.stuID }}</td>
+                                               <td>{{ result.students.stuName }}</td>
+                                               <td><input type = "checkbox"></td>
+                                              </tr>
+                                           {% endfor %}
+                                      </tr>
+                                      </tbody>
+                                 {% else %}
+                                      <p>暂时没有选课的学生信息，没有可以修改的学生信息</p>
+                                 {% endif %}
+                             </table>
+                        <div>
+                            <td><input type = "button"  class="btn btn-primary btn-sm" value = "全选" style="width: 176px" onclick="modify_student_select_all()"/></td>
+                            <td><input type = "button"  class="btn btn-primary btn-sm" value = "提交"  style="width: 176px" onclick="submit_modify_student_info()"/></td>
+                        </div>
+                      <!--教师删除学生信息-->
+                    {% elif user_action_type == 'teacher_delete_student_info' %}
+                         <!--<form method = "post" name = "modify_grade_form">-->
+                             <table class="table table-striped" id = "delete-student-info-table"">
+                                 {% if results %}
+                                      <h2 class="sub-header">删除学生信息</h2>
+                                      <tbody>
+                                      <tr>
+                                           <th>课程号</th>
+                                           <th>课程名</th>
+                                           <th>学生学号</th>
+                                           <th>姓名</th>
+                                           <th>删除</th>
+                                          {% for result in results %}
+                                             <tr>
+                                               <td>{{ result.courses.courseID }}</td>
+                                               <td>{{ result.courses.courseName }}</td>
+                                               <td>{{ result.students.stuID }}</td>
+                                               <td>{{ result.students.stuName }}</td>
+                                               <td><input type = "checkbox"></td>
+                                              </tr>
+                                           {% endfor %}
+                                      </tr>
+                                      </tbody>
+                                 {% else %}
+                                      <p>暂时没有选课的学生信息，没有可以删除的学生信息</p>
+                                 {% endif %}
+                             </table>
+                        <div>
+                            <td><input type = "button"  class="btn btn-primary btn-sm" value = "全选" style="width: 176px" onclick="delete_student_select_all()"/></td>
+                            <td><input type = "button"  class="btn btn-primary btn-sm" value = "提交"  style="width: 176px" onclick="submit_delete_student()"/></td>
+                        </div>
+                        <!--教师查看学生成绩-->
+                    {% elif user_action_type == 'check_grade' %}
+                        <table class="table table-striped">
+                        {% if results %}
+                              <h2 class="sub-header">查看学生成绩</h2>
+                              <tbody>
+                                  <tr>
+                                      <th>课程号</th>
+                                      <th>课程名</th>
+                                      <th>学生学号</th>
+                                      <th>分数</th>
+                                      {% for result in results %}
+                                          <tr>
+                                               <th>{{ result.courses.courseID }}</th>
+                                               <td>{{ result.courses.courseName }}</td>
+                                               <td>{{ result.students.stuID }}</td>
+                                               <td>{{ result.Grade }}</td>
+                                          </tr>
+                                      {% endfor %}
+                                  </tr>
+                              </tbody>
+                          {% else %}
+                              <p>暂时没有成绩</p>
+                          {% endif %}
+                        </table>
+                        <!--教师修改学生成绩-->
+                    {% elif user_action_type == 'modify_student_grade' %}
+                        <form method = "post" id = "modify_grade_form">
+                             <table class="table table-striped" id = "modify-grade-table">
+                                 {% if results %}
+                                      <h2 class="sub-header">修改学生成绩</h2>
+                                      <tbody>
+                                      <tr>
+                                           <th>课程号</th>
+                                           <th>课程名</th>
+                                           <th>学生学号</th>
+                                           <th>原分数</th>
+                                           <th>新分数</th>
+                                           <th><input type="checkbox" onclick="modify_select_all()"></th>
+                                          {% for result in results %}
+                                             <tr>
+                                               <td>{{ result.courses.courseID }}</td>
+                                               <td>{{ result.courses.courseName }}</td>
+                                               <td>{{ result.students.stuID }}</td>
+                                               <td>{{ result.Grade }}</td>
+                                               <td><input type="number" max="100" min="0"   class="form-control" placeholder="成绩" required autofocus></td>
+                                               <td><input type = "checkbox"></td>
+                                              </tr>
+                                           {% endfor %}
+                                      </tr>
+                                      </tbody>
+                                 {% else %}
+                                      <p>暂时没有成绩</p>
+                                 {% endif %}
+                             </table>
+                            <input type="hidden" value="" id="grade-data" name="data"></form>
+                            <div class="myStyle">
+                                  <button class="btn btn-primary btn-block" id="grade-submit-btn" style="width: 176px" onclick="submit_modify_grade()">确认修改</button>
+                            </div>
+                        <!--教师录入学生成绩-->
+                    {% elif user_action_type == 'typein_grade' %}
+                             <table class="table table-striped" id = "typein-grade-table">
+                                 {% if results %}
+                                      <h2 class="sub-header">录入学生成绩</h2>
+                                      <tbody>
+                                      <tr>
+                                           <th>课程号</th>
+                                           <th>课程名</th>
+                                           <th>学生学号</th>
+                                           <th>分数</th>
+                                           <th><input type="checkbox" onclick="typein_select_all()"></th>
+                                          {% for result in results %}
+                                             <tr>
+                                               <td>{{ result.courses.courseID }}</td>
+                                               <td>{{ result.courses.courseName }}</td>
+                                               <td>{{ result.students.stuID }}</td>
+                                               <td><input type="number" max="100" min="0"   class="form-control" placeholder="成绩" required autofocus></td>
+                                               <td><input type = "checkbox"></td>
+                                              </tr>
+                                           {% endfor %}
+                                      </tr>
+                                      </tbody>
+                                 {% else %}
+                                      <p>暂时没有学生信息，无需录入</p>
+                                 {% endif %}
+                             </table>
+                             <div class="myStyle">
+                                  <button class="btn btn-primary btn-block" type="submit" style="width: 176px" onclick="submit_grade()">确认提交</button>
+                             </div>
+                        <!-- 教师删除学生成绩 -->
+                    {% elif user_action_type == 'delete_student_grade' %}
+                        <table class="table table-striped" id = "delete-grade-table">
+                        {% if results %}
+                              <h2 class="sub-header">删除学生成绩</h2>
+                              <tbody>
+                                  <tr>
+                                      <th>课程号</th>
+                                      <th>课程名</th>
+                                      <th>学生学号</th>
+                                      <th>分数</th>
+                                      <th><input type="checkbox" onclick="delete_student_grade_select_all()"></th>
+                                      {% for result in results %}
+                                          <tr>
+                                               <td>{{ result.courses.courseID }}</td>
+                                               <td>{{ result.courses.courseName }}</td>
+                                               <td>{{ result.students.stuID }}</td>
+                                               <td>{{ result.Grade }}</td>
+                                               <td><input type = "checkbox"></td>
+                                          </tr>
+                                      {% endfor %}
+                                  </tr>
+                              </tbody>
+                          {% else %}
+                              <p>暂时没有成绩</p>
+                          {% endif %}
+                        </table>
+                        <div class="myStyle">
+                            <button class="btn btn-primary btn-block" type="submit" style="width: 176px" onclick="submit_delete_student_grade_grade()">确认删除</button>
+                        </div>
+
+                    {% elif user_action_type == 'statistics_student_grade' %}
+                        <script type="text/javascript">
+                        //alert("统计学生成绩");
+		  $(document).ready(function() {
+			$.getJSON('/statistics-data', { }, function (callback){
+				console.info("got!");
+				var count = callback.length;
+				var insert = "";
+				for(var i = 1; i <= count; i++){
+					var Name = callback[i-1].name;
+
+					insert += "<div class='col-md-5'> <div id='container-col-";
+					insert += Name;
+					insert += "' class='height: 500px'> </div> </div>";
+					insert += "<div class='col-md-5'> <div id='container-pie-";
+					insert += Name;
+					insert += "' class='height: 500px'> </div> </div>";
+				}
+				$("#chart").html(insert);
+				for(var j = 1; j<=count; j++){
+					var Name = callback[j-1].name;
+					var Total = callback[j-1].total;
+					var xAxis = callback[j-1].xAxis;
+					var series = callback[j-1].series;
+
+					$(function () {
+					  $(document).ready(function () {
+					    var colid = '#container-col-' + Name;
+						$(colid).highcharts({
+							chart: {
+								type: 'column',
+								margin: [50, 100, 80]
+							},
+							title: {
+								text: Name+'成绩'
+							},
+							credits:{
+								enabled: false
+							},
+							xAxis: {
+								categories: xAxis,
+								labels: {
+									rotation: -45,
+									align: 'right',
+									style: {
+										fontSize: '6px',
+										fontFamily: 'Verdana, sans-serif'
+									}
+								}
+							},
+							yAxis: {
+								min: 0,
+								title: {
+									text: '人数'
+								}
+							},
+							legend: {
+								enabled: false
+							},
+							tooltip: {
+								pointFormat: '人数：<b>{point.y:.lf}</b>'
+							},
+
+							series: [{
+								name: '人数',
+								data: series,
+								dataLabels: {
+									enabled: true,
+									rotation: -90,
+									color: '#FFFFFF',
+									align: 'right',
+									x: 4,
+									y: 10,
+									style: {
+										fontSize: '13px',
+										fontFamily: 'Verdana, sans-serif',
+										textShadow: '0 0 3px black'
+									}
+								}
+							}]
+						});
+					  });
+					});
+					$(function () {
+					  $(document).ready(function () {
+						var pieid = '#container-pie-' + Name
+						$(pieid).highcharts({
+							chart: {
+								plotBackgroundColor: null,
+								plotBorderWidth: null,
+								plotShadow: false
+							},
+							title: {
+								text: Name+'成绩'
+							},
+							credits: {
+								enabled: false
+							},
+							tooltip: {
+								pointFormat: '{series.name}: <b>{point.percentage:.1f}%</b>'
+							},
+							plotOptions: {
+								pie: {
+									allowPointSelect: true,
+									cursor: 'pointer',
+									dataLabels: {
+										enabled: false
+									},
+								showInLegend: true
+								}
+							},
+							series: [{
+								type: 'pie',
+								name: '人数',
+								data: Total
+							}]
+						});
+					  });
+					});
+				}
+			});
+		  })
+		  </script>
+                        <!--增加其他功能 -->
+                    {% endif %}
+
+          </div>
+        </div>
+      </div>
+    </div>
+  <!-- Bootstrap core JavaScript
+    ================================================== -->
+    <!-- Placed at the end of the document so the pages load faster -->
+    <script src="/static/js/bootstrap.min.js"></script>
+    <!-- Just to make our placeholder images work. Don't actually copy the next line! -->
+    <script src="/static/js/holder.min.js"></script>
+    <!-- IE10 viewport hack for Surface/desktop Windows 8 bug -->
+    <script src="/static/js/ie10-viewport-bug-workaround.js"></script>
+  </body>
+</html>

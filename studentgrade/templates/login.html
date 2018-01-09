@@ -1,0 +1,70 @@
+
+<!DOCTYPE html>
+<html lang="en">
+    <meta charset="UTF-8">
+
+<script language="JavaScript">
+
+function skip()
+{
+	if( document.loginform.userid.value == "" )
+	{
+		//alert("请输入您的用户名");
+		document.loginform.userid.focus();
+		return ;
+	}
+	
+	if( document.loginform.password.value == "" )
+	{
+		//alert("请输入您的密码");
+		document.loginform.password.focus();
+		return ;
+	}
+	//document.loginform.submit();
+}
+
+</script>
+
+<body>
+
+    <div id="Layer1" style="position:absolute; width:100%; height:100%; z-index:-1">    
+        <img src="/static/images/bupt_1.jpg" height="100%" width="100%"/>
+    </div>
+
+	<form method = "post" name = "loginform" action = "/login/">
+
+        <link rel="stylesheet" type="text/css" href="/static/css/style.css" />
+        <font color="#8C7853" size=10 face="Verdana"><b>学生成绩管理系统</b></font></center>
+
+        <div id="main_body">
+            <div class="form_title">
+            <img src="/static/images/form_title.gif"/>
+            </div>
+
+            <div class="form_box">
+		
+                 <p class = "form_text">用户名：</p>
+                 <p class = "form_input_BG"><input type = "text" name = "userid" style = "width:200px;height:23px"></p>
+			     <p class = "clear">&nbsp;</p>
+			
+                <p class = "form_text" style = "margin-left:8px;">密码：</p>
+                <p class = "form_input_BG"><input type = "password" name = "password" style = "width:200px;height:23px"></p>
+			    <p class = "clear">&nbsp;</p>
+			
+                <p class="form_login_signup_btn">
+                <input title = "login now" style = "margin-left:96px;" type = "image" src = "/static/images/login_btn.png" name = "login" id = "login" onclick = "skip()">
+		        </p>
+            </div>
+	    </div>
+        <script type="text/javascript">
+        $(document).ready(function() {
+			$.getJSON('/login', { }, function (callback)
+            {
+
+            }
+                alert(callback);
+            })
+		</script>
+    </form>
+</body>
+
